@@ -4,9 +4,41 @@ Production-oriented **serverless** architecture that answers **text + image** qu
 
 The control plane is **Amazon API Gateway → AWS Lambda**. Incoming queries are **cascaded** between **Claude 3.5 Haiku** (fast tier) and **Claude Sonnet 5** (reasoning tier) on the **Amazon Bedrock Converse API**, wrapped with **Bedrock Guardrails**. The agent calls **Amazon Rekognition** (vision) and **Amazon Bedrock Knowledge Bases** (RAG over **OpenSearch Serverless** + **S3**). **Amazon Macie**, **CloudWatch + SNS**, **IAM**, **CloudTrail**, and **AWS Budgets** cover privacy, observability, and cost.
 
+## Table of contents
+
+- [Architecture Overview](#architecture-overview)
+- [Dual-tier model cascading](#dual-tier-model-cascading)
+- [Repository layout](#repository-layout)
+- [Prerequisites](#prerequisites)
+- [Local setup](#local-setup)
+- [Deploy](#deploy)
+- [Ingest knowledge](#ingest-knowledge)
+- [Query examples](#query-examples)
+- [Agent tools](#agent-tools)
+- [Security and Responsible AI](#security-and-responsible-ai)
+- [Observability and cost](#observability-and-cost)
+- [Testing](#testing)
+- [Responsible use](#responsible-use)
+- [License](#license)
+
 ---
 
-## Architecture
+## Architecture Overview
+
+<div align="center">
+  <img src="assets/architecture-diagram.png" alt="Production Multimodal Agentic Architecture on AWS" width="100%" />
+</div>
+
+<p align="center">
+  <em>Intelligent Dual-Tier LLM Cascading & Enterprise RAG Pipeline (100M+ Scale)</em>
+</p>
+
+- **Dual-Tier LLM Cascading:** Claude 3.5 Haiku (Fast Tier, 75%) vs. Claude Sonnet 5 (Reasoning Tier, 25%).
+- **Tool Integrations:** Amazon Rekognition (Vision AI) + Bedrock Knowledge Base (OpenSearch Serverless Vector Store).
+- **Enterprise Security & FinOps:** Bedrock Guardrails, Amazon Macie PII scanning, CloudWatch alarms via SNS, and Cost Explorer resource tagging.
+
+<details>
+<summary>Text and Mermaid fallback diagrams</summary>
 
 ```text
           Multimodal Agentic Architecture on AWS
@@ -94,6 +126,8 @@ flowchart TB
   end
 ```
 
+</details>
+
 **Happy path**
 
 1. Upload enterprise docs to S3 (`knowledge/…`) → ingest Lambda starts a Knowledge Base sync into OpenSearch Serverless.
@@ -138,6 +172,7 @@ Force a tier per request:
 .
 ├── app.py                          # CDK app
 ├── cdk.json                        # context flags (Macie, Budgets, models)
+├── assets/                         # architecture diagrams and README images
 ├── config/                         # local settings wrapper + guardrail spec
 ├── infra/
 │   ├── stacks/multimodal_agentic_architecture_stack.py
