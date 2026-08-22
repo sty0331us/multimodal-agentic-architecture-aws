@@ -1,0 +1,34 @@
+{
+  "app": "python3 app.py",
+  "watch": {
+    "include": ["**"],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "requirements*.txt",
+      "source.bat",
+      "**/__pycache__",
+      "tests",
+      "docs",
+      ".venv"
+    ]
+  },
+  "context": {
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/core:target-partitions": ["aws", "aws-cn"],
+    "stackName": "MultimodalAgenticArchitectureStack",
+    "projectName": "multimodal-agentic-architecture-aws",
+    "bedrockModelId": "anthropic.claude-sonnet-5",
+    "fastTierModelId": "anthropic.claude-3-5-haiku-20241022-v1:0",
+    "routerMode": "hybrid",
+    "embeddingModelId": "amazon.titan-embed-text-v2:0",
+    "embeddingDimensions": 1024,
+    "enableMacie": true,
+    "enableCloudTrail": true,
+    "enableBudgets": true,
+    "monthlyBudgetUsd": 150,
+    "alarmEmail": "",
+    "logRetentionDays": 30
+  }
+}
