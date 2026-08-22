@@ -37,7 +37,7 @@ The control plane is **Amazon API Gateway → AWS Lambda**. Incoming queries are
 - **Tool Integrations:** Amazon Rekognition (Vision AI) + Bedrock Knowledge Base (OpenSearch Serverless Vector Store).
 - **Enterprise Security & FinOps:** Bedrock Guardrails, Amazon Macie PII scanning, CloudWatch alarms via SNS, and Cost Explorer resource tagging.
 
-<details>
+<details open>
 <summary>Text and Mermaid fallback diagrams</summary>
 
 ```text
