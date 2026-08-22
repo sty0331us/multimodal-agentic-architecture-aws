@@ -1,0 +1,42 @@
+[project]
+name = "multimodal-agentic-architecture-aws"
+version = "1.0.0"
+description = "Multimodal Agentic Architecture on AWS — serverless agent with API Gateway, Lambda, Bedrock, Rekognition, OpenSearch Serverless, and Macie."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Principal AI & Cloud Architect" }]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "src"]
+addopts = "-q --strict-markers --disable-warnings"
+markers = [
+    "integration: requires AWS credentials and a deployed stack",
+    "e2e: live API tests against a deployed environment",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "infra", "tests", "scripts", "config"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/agent/prompts.py" = ["E501"]
+"scripts/*.py" = ["S310", "S603", "S607"]
+"infra/custom_resources/*.py" = ["S310"]
+"src/utils/images.py" = ["S310"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+packages = ["src", "infra", "config"]
+
+[tool.coverage.run]
+source = ["src", "config"]
+omit = ["tests/*"]
