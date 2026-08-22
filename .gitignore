@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+.venv312/
+venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# CDK
+cdk.out/
+cdk.context.json
+*.js
+!jest.config.js
+*.d.ts
+
+# AWS / secrets
+.env
+.env.local
+*.pem
+.aws-sam/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / local artifacts
+tmp/
+.cache/
+samples/images/*.jpg
+samples/images/*.png
+samples/images/*.jpeg
+!samples/images/.gitkeep
+
+# Lambda bundles
+.src-bundle/

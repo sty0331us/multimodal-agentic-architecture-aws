@@ -1,0 +1,10 @@
+# CDK application + local tooling (not bundled into Lambda).
+aws-cdk-lib>=2.178.0,<3
+constructs>=10.4.2,<11
+aws-cdk.aws-lambda-python-alpha>=2.178.0a0,<3
+boto3>=1.36.0
+botocore>=1.36.0
+pydantic>=2.10.0
+pydantic-settings>=2.7.0
+aws-lambda-powertools[tracer]>=3.4.0
+python-dotenv>=1.0.1
