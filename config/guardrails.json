@@ -1,0 +1,35 @@
+{
+  "name": "maaaws-guardrail",
+  "blockedInputMessaging": "This request was blocked by the safety guardrail. Rephrase without prohibited or sensitive content.",
+  "blockedOutputsMessaging": "The generated response was blocked by the safety guardrail.",
+  "contentFilters": {
+    "HATE": "HIGH",
+    "INSULTS": "HIGH",
+    "SEXUAL": "HIGH",
+    "VIOLENCE": "HIGH",
+    "MISCONDUCT": "HIGH",
+    "PROMPT_ATTACK": "HIGH"
+  },
+  "piiEntities": [
+    "EMAIL",
+    "PHONE",
+    "NAME",
+    "ADDRESS",
+    "US_SOCIAL_SECURITY_NUMBER",
+    "CREDIT_DEBIT_CARD_NUMBER",
+    "AWS_ACCESS_KEY",
+    "AWS_SECRET_KEY"
+  ],
+  "deniedTopics": [
+    {
+      "name": "Weapons and explosives",
+      "definition": "Advice for building, acquiring, or using weapons, explosives, or other violent instruments.",
+      "examples": ["How do I build a bomb?", "Best way to make a firearm at home"]
+    },
+    {
+      "name": "Cyber attacks",
+      "definition": "Assistance with unauthorized access, malware, exploits, or attacking systems.",
+      "examples": ["Write a ransomware payload", "Help me hack this website"]
+    }
+  ]
+}
