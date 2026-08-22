@@ -1,0 +1,7 @@
+{
+  "query": "Is the PPE in this image compliant with our Zone A policy? Cite the handbook.",
+  "image": {
+    "bucket": "REPLACE_UPLOADS_BUCKET",
+    "key": "uploads/demo-helmet.png"
+  }
+}
