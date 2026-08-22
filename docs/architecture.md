@@ -6,7 +6,7 @@ This document expands on the README with component contracts, failure modes, and
 
 1. Client obtains an API key (Usage Plan) and optionally a presigned PUT URL.
 2. Images should land in the **uploads** bucket (KMS-encrypted, 14-day expiry). Documents land in the **documents** bucket under `knowledge/`.
-3. `POST /v1/query` invokes the query Lambda. The handler validates the payload, the **model router** picks Haiku vs Sonnet 5, then the agent loop runs.
+3. `POST /v1/query` invokes the query Lambda. The handler validates the payload, the **model router** picks Claude 4.5 Haiku vs Sonnet 5, then the agent loop runs.
 4. Each Bedrock `converse` call is wrapped with `guardrailConfig.guardrailIdentifier` and `guardrailConfig.guardrailVersion` on **both** tiers.
 5. Tool use:
    - `analyze_image` → Rekognition `DetectLabels` / `DetectText` / `DetectFaces` / `DetectModerationLabels`
@@ -25,7 +25,7 @@ The agent is instructed to combine both signals and to ground policy answers in 
 
 ## Dual-tier cascading
 
-`src/agent/router.py` scores complexity with zero-cost heuristics (and optional Haiku JSON classification when `ROUTER_MODE=hybrid` and confidence is below `ROUTER_CONFIDENCE_FLOOR`). Fast-tier answers can escalate mid-loop to Sonnet 5. See the README cascading section for metrics and env vars.
+`src/agent/router.py` scores complexity with zero-cost heuristics (and optional Claude 4.5 Haiku JSON classification when `ROUTER_MODE=hybrid` and confidence is below `ROUTER_CONFIDENCE_FLOOR`). Fast-tier answers can escalate mid-loop to Sonnet 5. See the README cascading section for metrics and env vars.
 
 ## API Gateway 29-second limit
 

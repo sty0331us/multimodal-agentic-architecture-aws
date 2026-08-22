@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from agent.converse import BedrockConverseClient, is_claude_sonnet_5
-from models import DEFAULT_BEDROCK_MODEL_ID
+from models import DEFAULT_BEDROCK_MODEL_ID, DEFAULT_FAST_TIER_MODEL_ID, HAIKU_4_5_ID_SUBSTRING
 from settings import Settings, get_settings
 
 
@@ -36,9 +36,10 @@ def test_haiku_fast_tier_uses_temperature_and_skips_thinking() -> None:
     payload = client.build_request(
         messages=[{"role": "user", "content": [{"text": "hi"}]}],
         system=[{"text": "sys"}],
-        model_id="anthropic.claude-3-5-haiku-20241022-v1:0",
+        model_id=DEFAULT_FAST_TIER_MODEL_ID,
     )
-    assert payload["modelId"].endswith("haiku-20241022-v1:0")
+    assert payload["modelId"] == DEFAULT_FAST_TIER_MODEL_ID
+    assert HAIKU_4_5_ID_SUBSTRING in payload["modelId"]
     assert payload["inferenceConfig"]["temperature"] == 0.2
     assert payload["inferenceConfig"]["maxTokens"] == 512
     assert "additionalModelRequestFields" not in payload

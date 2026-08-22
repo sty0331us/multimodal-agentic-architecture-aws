@@ -20,7 +20,7 @@
     "stackName": "MultimodalAgenticArchitectureStack",
     "projectName": "multimodal-agentic-architecture-aws",
     "bedrockModelId": "anthropic.claude-sonnet-5",
-    "fastTierModelId": "anthropic.claude-3-5-haiku-20241022-v1:0",
+    "fastTierModelId": "anthropic.claude-haiku-4-5-20251001-v1:0",
     "routerMode": "hybrid",
     "embeddingModelId": "amazon.titan-embed-text-v2:0",
     "embeddingDimensions": 1024,

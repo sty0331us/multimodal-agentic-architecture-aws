@@ -2,7 +2,7 @@
 
 Production-oriented **serverless** architecture that answers **text + image** questions, grounded in your documents.
 
-The control plane is **Amazon API Gateway → AWS Lambda**. Incoming queries are **cascaded** between **Claude 3.5 Haiku** (fast tier) and **Claude Sonnet 5** (reasoning tier) on the **Amazon Bedrock Converse API**, wrapped with **Bedrock Guardrails**. The agent calls **Amazon Rekognition** (vision) and **Amazon Bedrock Knowledge Bases** (RAG over **OpenSearch Serverless** + **S3**). **Amazon Macie**, **CloudWatch + SNS**, **IAM**, **CloudTrail**, and **AWS Budgets** cover privacy, observability, and cost.
+The control plane is **Amazon API Gateway → AWS Lambda**. Incoming queries are **cascaded** between **Claude 4.5 Haiku** (fast tier) and **Claude Sonnet 5** (reasoning tier) on the **Amazon Bedrock Converse API**, wrapped with **Bedrock Guardrails**. The agent calls **Amazon Rekognition** (vision) and **Amazon Bedrock Knowledge Bases** (RAG over **OpenSearch Serverless** + **S3**). **Amazon Macie**, **CloudWatch + SNS**, **IAM**, **CloudTrail**, and **AWS Budgets** cover privacy, observability, and cost.
 
 ## Table of contents
 
@@ -33,7 +33,7 @@ The control plane is **Amazon API Gateway → AWS Lambda**. Incoming queries are
   <em>Intelligent Dual-Tier LLM Cascading & Enterprise RAG Pipeline (100M+ Scale)</em>
 </p>
 
-- **Dual-Tier LLM Cascading:** Claude 3.5 Haiku (Fast Tier, 75%) vs. Claude Sonnet 5 (Reasoning Tier, 25%).
+- **Dual-Tier LLM Cascading:** Claude 4.5 Haiku (Fast Tier, 75%) vs. Claude Sonnet 5 (Reasoning Tier, 25%).
 - **Tool Integrations:** Amazon Rekognition (Vision AI) + Bedrock Knowledge Base (OpenSearch Serverless Vector Store).
 - **Enterprise Security & FinOps:** Bedrock Guardrails, Amazon Macie PII scanning, CloudWatch alarms via SNS, and Cost Explorer resource tagging.
 
@@ -53,8 +53,8 @@ The control plane is **Amazon API Gateway → AWS Lambda**. Incoming queries are
                                     │
                     ┌───────────────┴───────────────┐
                     ▼                               ▼
-           Claude 3.5 Haiku                  Claude Sonnet 5
-           (fast: chat / FAQ)                (reasoning / multimodal)
+           Claude 4.5 Haiku                  Claude Sonnet 5
+           (fast: chat / FAQ, 75%)           (reasoning / multimodal, 25%)
                     └───────────────┬───────────────┘
                                     │
               ┌─────────────────────┼─────────────────────┐
@@ -90,7 +90,7 @@ flowchart TB
     I[Ingest Lambda]
   end
   subgraph AI
-    H[Claude 3.5 Haiku fast tier]
+    H[Claude 4.5 Haiku fast tier]
     B[Claude Sonnet 5 reasoning tier]
     R[Rekognition]
     KB[Bedrock Knowledge Base]
@@ -133,7 +133,7 @@ flowchart TB
 1. Upload enterprise docs to S3 (`knowledge/…`) → ingest Lambda starts a Knowledge Base sync into OpenSearch Serverless.
 2. Optionally upload an image via presigned PUT (preferred over base64).
 3. `POST /v1/query` with `{ "query": "...", "image": { "bucket", "key" } }`.
-4. The router classifies complexity (heuristics, optional Haiku), then Converse runs on **Haiku** or **Sonnet 5** with the same Guardrails and tools.
+4. The router classifies complexity (heuristics, optional Claude 4.5 Haiku), then Converse runs on **Haiku 4.5** or **Sonnet 5** with the same Guardrails and tools.
 5. The selected model may call `analyze_image` and/or `retrieve_knowledge`. Fast-tier turns escalate to Sonnet if vision tools, multi-step tools, or low-confidence answers appear.
 
 API Gateway REST integrations time out at **29 seconds**. The stack also emits **QueryFunctionUrl** (IAM-auth, 2-minute Lambda timeout) for longer multimodal turns. See [docs/architecture.md](docs/architecture.md).
@@ -146,17 +146,17 @@ High-traffic agents should not spend Sonnet 5 tokens on “hello” or a one-lin
 
 | Tier | Default Bedrock id | Used for |
 | --- | --- | --- |
-| **Fast** | `FAST_TIER_MODEL_ID` = `anthropic.claude-3-5-haiku-20241022-v1:0` | Greetings, chit-chat, simple FAQ, one-shot lookup, tiny summaries |
-| **Reasoning** | `REASONING_TIER_MODEL_ID` = `anthropic.claude-sonnet-5` | Images, code, multi-hop RAG, planning, deep comparison. `BEDROCK_MODEL_ID` still overrides this if set |
+| **Fast** (75% traffic) | `FAST_TIER_MODEL_ID` = `anthropic.claude-haiku-4-5-20251001-v1:0` | Greetings, chit-chat, simple FAQ, one-shot lookup, tiny summaries |
+| **Reasoning** (25% traffic) | `REASONING_TIER_MODEL_ID` = `anthropic.claude-sonnet-5` | Images, code, multi-hop RAG, planning, deep comparison. `BEDROCK_MODEL_ID` still overrides this if set |
 
 **Decision path (`src/agent/router.py`)**
 
 1. Client override: `metadata.model_tier` = `fast` \| `reasoning`
-2. `ROUTER_MODE`: `heuristic` (no extra Bedrock call), `hybrid` (default — Haiku classifier only when heuristic confidence is low), `reasoning_only`, `fast_only`
-3. Heuristics: images, code fences, analysis language → Sonnet; short greetings / `what is` lookups → Haiku
-4. **Escalation:** if Haiku starts `analyze_image`, a second tool turn, or answers with low-confidence language, the loop continues on Sonnet 5 (same Guardrails and messages)
+2. `ROUTER_MODE`: `heuristic` (no extra Bedrock call), `hybrid` (default — Claude 4.5 Haiku classifier only when heuristic confidence is low), `reasoning_only`, `fast_only`
+3. Heuristics: images, code fences, analysis language → Sonnet; short greetings / `what is` lookups → Haiku 4.5
+4. **Escalation:** if Haiku 4.5 starts `analyze_image`, a second tool turn, or answers with low-confidence language, the loop continues on Sonnet 5 (same Guardrails and messages)
 
-**Cost impact:** Haiku is typically an order of magnitude cheaper per token than Sonnet. In mixed production traffic (chat + a smaller share of multimodal/analysis), most invocations stay on the fast tier. Watch CloudWatch metrics `ModelTierFast`, `ModelTierReasoning`, `RouterEscalations`, `AgentLatencyMs`, `InputTokens`, and `OutputTokens`. Structured logs include `model_tier`, `model_id`, `router_reason`, `router_source`, `latency_ms`, and `usage`.
+**Cost impact:** Claude 4.5 Haiku is typically an order of magnitude cheaper per token than Sonnet 5, so FinOps stays healthy when most mixed production traffic (chat + a smaller share of multimodal/analysis) stays on the fast tier. Watch CloudWatch metrics `ModelTierFast`, `ModelTierReasoning`, `RouterEscalations`, `AgentLatencyMs`, `InputTokens`, and `OutputTokens`. Structured logs include `model_tier`, `model_id`, `router_reason`, `router_source`, `latency_ms`, and `usage`.
 
 Force a tier per request:
 
@@ -200,7 +200,7 @@ Force a tier per request:
 | Node.js 18+ and AWS CDK CLI | `npm install -g aws-cdk` |
 | Docker | Required to bundle Lambda (`PythonFunction`) |
 | AWS CLI v2 | Named profile with permissions to deploy the stack |
-| Model access | Bedrock console → enable **Claude Sonnet 5** and **Claude 3.5 Haiku** plus Titan Text Embeddings V2 |
+| Model access | Bedrock console → enable **Claude Sonnet 5** and **Claude 4.5 Haiku** plus Titan Text Embeddings V2 |
 
 Suggested IAM for the deployer (not the runtime roles): CloudFormation, IAM, Lambda, API Gateway, S3, KMS, Bedrock, AOSS, Rekognition (none at deploy), Macie, CloudTrail, Budgets, CloudWatch, SNS, WAFv2.
 
@@ -239,7 +239,7 @@ Useful context keys (also in `cdk.json`):
 | `stackName` | `MultimodalAgenticArchitectureStack` | CloudFormation / CDK stack id |
 | `projectName` | `multimodal-agentic-architecture-aws` | `Project` tag, KMS alias, Cost Explorer filter |
 | `bedrockModelId` | `anthropic.claude-sonnet-5` | Reasoning-tier Converse id (also `REASONING_TIER_MODEL_ID`)
-| `fastTierModelId` | `anthropic.claude-3-5-haiku-20241022-v1:0` | Fast-tier Haiku id |
+| `fastTierModelId` | `anthropic.claude-haiku-4-5-20251001-v1:0` | Fast-tier Claude 4.5 Haiku id |
 | `routerMode` | `hybrid` | `heuristic` / `hybrid` / `reasoning_only` / `fast_only` |
 | `embeddingModelId` | `amazon.titan-embed-text-v2:0` | Knowledge Base embeddings (1024-d) |
 | `enableMacie` | `true` | Daily PII classification on S3 |
@@ -333,7 +333,7 @@ curl -s "$API_BASE_URL/v1/health"
 
 ## Agent tools
 
-The selected **tier** runs Converse. Sonnet 5 keeps adaptive thinking (`THINKING_TYPE=adaptive`); Haiku uses a low temperature and a smaller `FAST_TIER_MAX_TOKENS`. Images are sent as Converse `image` blocks (pixels first) and always route to the reasoning tier.
+The selected **tier** runs Converse. Sonnet 5 keeps adaptive thinking (`THINKING_TYPE=adaptive`); Claude 4.5 Haiku uses a low temperature and a smaller `FAST_TIER_MAX_TOKENS` (extended thinking is omitted on the fast path). Images are sent as Converse `image` blocks (pixels first) and always route to the reasoning tier.
 
 | Tool | AWS API | When it runs |
 | --- | --- | --- |
@@ -362,7 +362,7 @@ Details: [docs/security.md](docs/security.md).
 - Dashboard **MultimodalAgenticArchitectureAws** (errors, duration, 5XX, throttles).
 - Custom metrics: `ModelTierFast`, `ModelTierReasoning`, `RouterEscalations`, `AgentLatencyMs`, token counts.
 - Alarms: Lambda errors, API 5XX, p99 duration, budget 80% / 100% forecast.
-- Tag `Project=multimodal-agentic-architecture-aws` for Cost Explorer.
+- **FinOps:** ~75% of traffic stays on Claude 4.5 Haiku (fast tier); ~25% uses Claude Sonnet 5. Tag `Project=multimodal-agentic-architecture-aws` for Cost Explorer.
 - CloudWatch log groups: `/aws/lambda/multimodal-agentic-query-handler`, `/aws/lambda/multimodal-agentic-ingest-handler`, `/aws/apigateway/multimodal-agentic-architecture-aws`.
 - OpenSearch Serverless bills **minimum OCUs while the collection exists**. Destroy non-prod stacks.
 

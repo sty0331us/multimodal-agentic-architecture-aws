@@ -19,12 +19,12 @@ Docker is required at deploy time because `PythonFunction` bundles `src/requirem
 In the Bedrock console, enable:
 
 - Anthropic Claude Sonnet 5 (`anthropic.claude-sonnet-5`) — reasoning tier
-- Anthropic Claude 3.5 Haiku (`anthropic.claude-3-5-haiku-20241022-v1:0`) — fast tier
+- Anthropic Claude 4.5 Haiku (`anthropic.claude-haiku-4-5-20251001-v1:0`) — fast tier
 - Amazon Titan Text Embeddings V2 (`amazon.titan-embed-text-v2:0`)
 
-Geo inference profiles are supported: `us.anthropic.claude-sonnet-5`, `eu.anthropic.claude-sonnet-5`, `au.anthropic.claude-sonnet-5`, or `global.anthropic.claude-sonnet-5`. Set `bedrockModelId` / `BEDROCK_MODEL_ID` accordingly.
+Geo inference profiles are supported: `us.anthropic.claude-sonnet-5`, `eu.anthropic.claude-sonnet-5`, `au.anthropic.claude-sonnet-5`, or `global.anthropic.claude-sonnet-5`. Set `bedrockModelId` / `BEDROCK_MODEL_ID` accordingly. Claude 4.5 Haiku geo profiles follow the same prefix pattern (`us.anthropic.claude-haiku-4-5-20251001-v1:0`, and so on).
 
-Claude Sonnet 5 uses **adaptive thinking** by default. Lambda omits `temperature` while thinking is on (`THINKING_TYPE=adaptive`) and sets `output_config.effort` from `THINKING_EFFORT` (default `medium`). Raise `MAX_TOKENS` if answers truncate; thinking tokens count against the same budget.
+Claude Sonnet 5 uses **adaptive thinking** by default. Lambda omits `temperature` while thinking is on (`THINKING_TYPE=adaptive`) and sets `output_config.effort` from `THINKING_EFFORT` (default `medium`). Raise `MAX_TOKENS` if answers truncate; thinking tokens count against the same budget. Claude 4.5 Haiku on the fast path uses temperature `0.2` and a smaller `FAST_TIER_MAX_TOKENS` budget; extended thinking is omitted to keep FAQ/chit-chat cheap.
 
 ## Ingestion
 

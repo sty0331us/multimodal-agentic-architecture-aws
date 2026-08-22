@@ -1,4 +1,4 @@
-"""Dual-tier model cascading: fast (Haiku) vs reasoning (Sonnet 5)."""
+"""Dual-tier model cascading: fast (Claude 4.5 Haiku) vs reasoning (Claude Sonnet 5)."""
 
 from __future__ import annotations
 
@@ -48,9 +48,11 @@ def test_multi_hop_analysis_goes_to_reasoning() -> None:
 def test_router_binds_configured_model_ids() -> None:
     settings = Settings(router_mode="heuristic")
     router = ModelRouter(settings)
+    assert DEFAULT_FAST_TIER_MODEL_ID == "anthropic.claude-haiku-4-5-20251001-v1:0"
     fast = router.decide(QueryRequest(query="hello"))
     assert fast.tier == "fast"
     assert fast.model_id == DEFAULT_FAST_TIER_MODEL_ID
+    assert "claude-haiku-4-5" in fast.model_id
     hard = router.decide(
         QueryRequest(query="Refactor this CDK stack and design a multi-region architecture.")
     )
@@ -70,7 +72,9 @@ def test_hybrid_uses_llm_when_heuristic_is_ambiguous() -> None:
     class FakeClassifier:
         def converse(self, **kwargs):
             assert kwargs["model_id"] == DEFAULT_FAST_TIER_MODEL_ID
+            assert "claude-haiku-4-5" in kwargs["model_id"]
             assert kwargs["inference_config"]["maxTokens"] == 80
+            assert kwargs["inference_config"]["temperature"] == 0
             return {
                 "stopReason": "end_turn",
                 "output": {

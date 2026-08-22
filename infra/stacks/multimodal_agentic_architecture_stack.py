@@ -28,7 +28,7 @@ class MultimodalAgenticArchitectureStack(Stack):
         project = str(ctx(self, "projectName", "multimodal-agentic-architecture-aws"))
         model_id = str(ctx(self, "bedrockModelId", "anthropic.claude-sonnet-5"))
         fast_tier_model_id = str(
-            ctx(self, "fastTierModelId", "anthropic.claude-3-5-haiku-20241022-v1:0")
+            ctx(self, "fastTierModelId", "anthropic.claude-haiku-4-5-20251001-v1:0")
         )
         router_mode = str(ctx(self, "routerMode", "hybrid"))
         embedding_id = str(ctx(self, "embeddingModelId", "amazon.titan-embed-text-v2:0"))

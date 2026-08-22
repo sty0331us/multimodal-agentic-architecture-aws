@@ -8,4 +8,6 @@ DEFAULT_BEDROCK_MODEL_ID = DEFAULT_REASONING_TIER_MODEL_ID
 SONNET_5_ID_SUBSTRING = "claude-sonnet-5"
 
 # Fast tier — intent classification, chit-chat, simple Q&A, lightweight lookup.
-DEFAULT_FAST_TIER_MODEL_ID = "anthropic.claude-3-5-haiku-20241022-v1:0"
+# Bedrock Runtime / Converse id. Geo profiles: us. / eu. / au. / jp. / global.
+DEFAULT_FAST_TIER_MODEL_ID = "anthropic.claude-haiku-4-5-20251001-v1:0"
+HAIKU_4_5_ID_SUBSTRING = "claude-haiku-4-5"

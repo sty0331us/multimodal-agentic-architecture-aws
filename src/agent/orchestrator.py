@@ -1,4 +1,4 @@
-"""Agent orchestrator for Multimodal Agentic Architecture on AWS (Haiku fast / Sonnet 5 reasoning)."""
+"""Agent orchestrator for Multimodal Agentic Architecture on AWS (Claude 4.5 Haiku fast / Sonnet 5 reasoning)."""
 
 from __future__ import annotations
 

@@ -82,7 +82,9 @@ class BedrockConverseClient:
         """Build a Converse payload for the selected tier.
 
         Claude Sonnet 5: adaptive thinking on; omit temperature.
-        Claude 3.5 Haiku (fast tier): temperature allowed; no thinking block.
+        Claude 4.5 Haiku (fast tier): temperature allowed; no thinking block
+        (Haiku 4.5 supports extended thinking, but the fast path omits it for
+        latency and token cost).
         Guardrails are attached whenever configured, for every tier.
         """
         resolved = model_id or self._settings.resolved_reasoning_model_id

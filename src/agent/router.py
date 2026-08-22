@@ -1,4 +1,4 @@
-"""Model router for Multimodal Agentic Architecture on AWS (Haiku fast / Sonnet 5 reasoning)."""
+"""Model router for Multimodal Agentic Architecture on AWS (Claude 4.5 Haiku fast / Sonnet 5 reasoning)."""
 
 from __future__ import annotations
 
@@ -106,7 +106,7 @@ class ModelTierDecision:
 
 
 class ModelRouter:
-    """Heuristic-first router with optional Haiku classification on ambiguous queries."""
+    """Heuristic-first router with optional Claude 4.5 Haiku classification on ambiguous queries."""
 
     def __init__(self, settings: Settings, classifier: Any | None = None) -> None:
         self._settings = settings
